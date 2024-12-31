@@ -56,10 +56,14 @@ github.com/ralvarezdev/go-flags v0.2.3/go.mod h1:xc0ii1VySdiV/s17KRo1GJ6bLxy5eOv
 github.com/ralvarezdev/go-gin v0.2.0 h1:vHGDi+YNU/qGRiC80MY+O9WLTaigMH+LPOMyxGHBxZs=
 github.com/ralvarezdev/go-gin v0.2.0/go.mod h1:MZlntZZiR3XOOM9vmkW6Py1R9cUFCmsPebuqDKfL4Hk=
 github.com/ralvarezdev/go-gin v0.2.1/go.mod h1:MZlntZZiR3XOOM9vmkW6Py1R9cUFCmsPebuqDKfL4Hk=
+github.com/ralvarezdev/go-gin v0.3.0 h1:Eb+FjY0Wur6PKrZ7+HeU3iLSqfwElFMBVbf1lP59SmM=
+github.com/ralvarezdev/go-gin v0.3.0/go.mod h1:L5xYdPWucJkR51PogtpfaNzFRR4NVh3NaHATLdS1Qkc=
+github.com/ralvarezdev/go-gin v0.3.1/go.mod h1:L5xYdPWucJkR51PogtpfaNzFRR4NVh3NaHATLdS1Qkc=
 github.com/ralvarezdev/go-grpc v0.2.2 h1:DWkKJSR15DtqLLnqtV2G9GmdDZE0uJ4s2a3HoJFTOmU=
 github.com/ralvarezdev/go-grpc v0.2.2/go.mod h1:h7SESX5KRpJbicW52s9Ys//Spp6cODBPMZE15+U3Nrw=
 github.com/ralvarezdev/go-jwt v0.3.1 h1:TXRjjAsIV5dLkoT5ujQsqD30hXRzTkwD08wnCbhrA1w=
 github.com/ralvarezdev/go-jwt v0.3.1/go.mod h1:Yo+HExsp8k7Fd/WDn4SOF3lnLzBnfR6SqdHjcR09+D4=
+github.com/ralvarezdev/go-jwt v0.3.3/go.mod h1:Yo+HExsp8k7Fd/WDn4SOF3lnLzBnfR6SqdHjcR09+D4=
 github.com/ralvarezdev/go-logger v0.2.2 h1:j58spza2L6s+vAibifHSuUPrXm0+6nWZWR3SOg8ihBk=
 github.com/ralvarezdev/go-logger v0.2.2/go.mod h1:v5OvFrkS+wsYNTCVegXWiRhBtcYrQJr4LDMDntvpAos=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

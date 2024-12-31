@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	gongin "github.com/ralvarezdev/go-gin"
+	goginresponse "github.com/ralvarezdev/go-gin/response"
 	gongintypes "github.com/ralvarezdev/go-gin/response"
 	gogrpcstauts "github.com/ralvarezdev/go-grpc/status"
 	"google.golang.org/grpc/codes"
@@ -12,13 +13,6 @@ import (
 )
 
 type (
-	// Handler interface
-	Handler interface {
-		HandlePrepareCtxError(ctx *gin.Context, err error)
-		HandleResponse(ctx *gin.Context, response interface{}, err error)
-		HandleErrorResponse(ctx *gin.Context, err error)
-	}
-
 	// DefaultHandler struct
 	DefaultHandler struct {
 		mode *goflagsmode.Flag
@@ -34,25 +28,56 @@ func NewDefaultHandler(mode *goflagsmode.Flag) (*DefaultHandler, error) {
 	return &DefaultHandler{mode: mode}, nil
 }
 
-// HandleResponse handles the response from the gRPC server
-func (d *DefaultHandler) HandleResponse(
+// HandleSuccess handles the success response
+func (d *DefaultHandler) HandleSuccess(
 	ctx *gin.Context,
-	code int,
-	response interface{},
-	err error,
+	response *goginresponse.Response,
 ) {
-	// Check if the error is nil
-	if err == nil {
-		ctx.JSON(code, response)
+	if response != nil && response.Code != nil {
+		ctx.JSON(*response.Code, response.Data)
+	} else {
+		goginresponse.SendInternalServerError(ctx)
+	}
+}
+
+// HandleErrorProne handles the response that may contain an error
+func (d *DefaultHandler) HandleErrorProne(
+	ctx *gin.Context,
+	successResponse *goginresponse.Response,
+	errorResponse *goginresponse.Response,
+) {
+	// Check if the error response is nil
+	if errorResponse != nil {
+		d.HandleError(ctx, errorResponse)
 		return
 	}
 
-	// Handle the error response
-	d.HandleErrorResponse(ctx, err)
+	// Handle the success response
+	d.HandleSuccess(ctx, successResponse)
 }
 
-// HandleErrorResponse handles the error response from the gRPC server
-func (d *DefaultHandler) HandleErrorResponse(ctx *gin.Context, err error) {
+// HandleError handles the error response
+func (d *DefaultHandler) HandleError(
+	ctx *gin.Context,
+	response *goginresponse.Response,
+) {
+	// Check if the response is nil or if the response code is not nil
+	if response == nil {
+		goginresponse.SendInternalServerError(ctx)
+		return
+	} else if response.Code != nil {
+		ctx.JSON(*response.Code, response.Data)
+		ctx.Abort()
+		return
+	}
+
+	// Get the error from the response data
+	err, ok := response.Data.(error)
+	if !ok {
+		goginresponse.SendInternalServerError(ctx)
+		return
+	}
+
 	// Extract the gRPC code and error from the status
 	extractedCode, extractedErr := gogrpcstauts.ExtractErrorFromStatus(
 		d.mode,

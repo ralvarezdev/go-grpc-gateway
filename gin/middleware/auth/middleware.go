@@ -1,14 +1,11 @@
 package auth
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	gogin "github.com/ralvarezdev/go-gin"
 	goginmiddlewareauth "github.com/ralvarezdev/go-gin/middleware/auth"
 	goginresponse "github.com/ralvarezdev/go-gin/response"
 	gojwtinterception "github.com/ralvarezdev/go-jwt/token/interception"
 	gologger "github.com/ralvarezdev/go-logger"
-	"net/http"
 )
 
 // Middleware struct
@@ -48,10 +45,7 @@ func (m *Middleware) Authenticate(
 			if grpcInterceptions == nil {
 				m.logger.MissingGRPCInterceptions()
 			}
-			ctx.JSON(
-				http.StatusInternalServerError,
-				goginresponse.NewErrorResponse(errors.New(gogin.InternalServerError)),
-			)
+			goginresponse.SendInternalServerError(ctx)
 			return
 		}
 
@@ -62,11 +56,7 @@ func (m *Middleware) Authenticate(
 		interception, ok := (*grpcInterceptions)[grpcMethod]
 		if !ok {
 			m.logger.MissingGRPCMethod(requestURI)
-			ctx.JSON(
-				http.StatusInternalServerError,
-				goginresponse.NewErrorResponse(errors.New(gogin.InternalServerError)),
-			)
-			ctx.Abort()
+			goginresponse.SendInternalServerError(ctx)
 			return
 		}
 
