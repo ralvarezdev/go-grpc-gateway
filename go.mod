@@ -4,11 +4,11 @@ go 1.23.4
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/ralvarezdev/go-flags v0.2.3
-	github.com/ralvarezdev/go-gin v0.3.1
+	github.com/ralvarezdev/go-flags v0.2.5
+	github.com/ralvarezdev/go-gin v0.3.2
 	github.com/ralvarezdev/go-grpc v0.2.2
-	github.com/ralvarezdev/go-jwt v0.3.3
-	github.com/ralvarezdev/go-logger v0.2.2
+	github.com/ralvarezdev/go-jwt v0.3.7
+	github.com/ralvarezdev/go-logger v0.3.0
 	google.golang.org/grpc v1.69.2
 )
 

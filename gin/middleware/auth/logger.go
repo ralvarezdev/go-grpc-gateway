@@ -25,8 +25,7 @@ func (l *Logger) MethodNotSupported(method string) {
 	l.logger.LogMessage(
 		gologger.NewLogMessage(
 			"Method not supported",
-			gologgerstatus.StatusWarning,
-			nil,
+			gologgerstatus.Warning,
 			method,
 		),
 	)
@@ -37,8 +36,7 @@ func (l *Logger) BaseUriIsLongerThanFullPath(fullPath string) {
 	l.logger.LogMessage(
 		gologger.NewLogMessage(
 			"Base URI is longer than full path",
-			gologgerstatus.StatusWarning,
-			nil,
+			gologgerstatus.Warning,
 			fullPath,
 		),
 	)
@@ -49,8 +47,7 @@ func (l *Logger) MissingGRPCMethod(fullPath string) {
 	l.logger.LogMessage(
 		gologger.NewLogMessage(
 			"Missing gRPC method",
-			gologgerstatus.StatusWarning,
-			nil,
+			gologgerstatus.Warning,
 			fullPath,
 		),
 	)
@@ -61,7 +58,6 @@ func (l *Logger) MissingGRPCInterceptions() {
 	l.logger.LogError(
 		gologger.NewLogError(
 			"Missing gRPC interceptions",
-			nil,
 			ErrNilGRPCInterceptions,
 		),
 	)
