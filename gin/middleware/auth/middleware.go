@@ -42,9 +42,6 @@ func (m *Middleware) Authenticate(
 	return func(ctx *gin.Context) {
 		// Check if the gRPC interceptions is nil
 		if grpcInterceptions == nil {
-			if grpcInterceptions == nil {
-				m.logger.MissingGRPCInterceptions()
-			}
 			goginresponse.SendInternalServerError(ctx)
 			return
 		}

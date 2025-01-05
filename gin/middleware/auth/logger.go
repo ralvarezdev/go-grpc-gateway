@@ -1,64 +1,46 @@
 package auth
 
 import (
-	gologger "github.com/ralvarezdev/go-logger"
-	gologgerstatus "github.com/ralvarezdev/go-logger/status"
+	gologgermode "github.com/ralvarezdev/go-logger/mode"
+	gologgermodenamed "github.com/ralvarezdev/go-logger/mode/named"
 )
 
 // Logger is the logger for the auth middleware
 type Logger struct {
-	logger gologger.Logger
+	logger gologgermodenamed.Logger
 }
 
 // NewLogger is the logger for the auth middleware
-func NewLogger(logger gologger.Logger) (*Logger, error) {
-	// Check if the logger is nil
-	if logger == nil {
-		return nil, gologger.ErrNilLogger
+func NewLogger(header string, modeLogger gologgermode.Logger) (*Logger, error) {
+	// Initialize the mode named logger
+	namedLogger, err := gologgermodenamed.NewDefaultLogger(header, modeLogger)
+	if err != nil {
+		return nil, err
 	}
 
-	return &Logger{logger: logger}, nil
+	return &Logger{logger: namedLogger}, nil
 }
 
 // MethodNotSupported logs that the method is not supported
 func (l *Logger) MethodNotSupported(method string) {
-	l.logger.LogMessage(
-		gologger.NewLogMessage(
-			"Method not supported",
-			gologgerstatus.Warning,
-			method,
-		),
+	l.logger.Warning(
+		"method not supported",
+		method,
 	)
 }
 
 // BaseUriIsLongerThanFullPath logs that the base URI is longer than the full path
 func (l *Logger) BaseUriIsLongerThanFullPath(fullPath string) {
-	l.logger.LogMessage(
-		gologger.NewLogMessage(
-			"Base URI is longer than full path",
-			gologgerstatus.Warning,
-			fullPath,
-		),
+	l.logger.Warning(
+		"base uri is longer than full path",
+		fullPath,
 	)
 }
 
 // MissingGRPCMethod logs a MissingGRPCMethodError
 func (l *Logger) MissingGRPCMethod(fullPath string) {
-	l.logger.LogMessage(
-		gologger.NewLogMessage(
-			"Missing gRPC method",
-			gologgerstatus.Warning,
-			fullPath,
-		),
-	)
-}
-
-// MissingGRPCInterceptions logs a MissingGRPCInterceptionsError
-func (l *Logger) MissingGRPCInterceptions() {
-	l.logger.LogError(
-		gologger.NewLogError(
-			"Missing gRPC interceptions",
-			ErrNilGRPCInterceptions,
-		),
+	l.logger.Warning(
+		"missing grpc method",
+		fullPath,
 	)
 }
