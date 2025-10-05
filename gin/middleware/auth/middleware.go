@@ -1,31 +1,44 @@
 package auth
 
 import (
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
 	goginmiddlewareauth "github.com/ralvarezdev/go-gin/middleware/auth"
 	goginresponse "github.com/ralvarezdev/go-gin/response"
-	gojwtinterception "github.com/ralvarezdev/go-jwt/token/interception"
-	gologger "github.com/ralvarezdev/go-logger"
+	gojwttoken "github.com/ralvarezdev/go-jwt/token"
 )
 
-// Middleware struct
-type Middleware struct {
-	logger          *Logger
-	authenticator   goginmiddlewareauth.Authenticator
-	authenticateFns map[string]gin.HandlerFunc
-}
+type (
+	// Middleware struct
+	Middleware struct {
+		logger          *slog.Logger
+		authenticator   goginmiddlewareauth.Authenticator
+		authenticateFns map[string]gin.HandlerFunc
+	}
+)
 
 // NewMiddleware creates a new authentication middleware
+//
+// Parameters:
+//
+//   - authenticator: The authenticator (cannot be nil)
+//   - logger: The logger (optional, can be nil)
+//
+// Returns:
+//
+//   - *Middleware: The authentication middleware
 func NewMiddleware(
-	logger *Logger,
 	authenticator goginmiddlewareauth.Authenticator,
+	logger *slog.Logger,
 ) (*Middleware, error) {
-	// Check if either the logger or authenticator is nil
-	if logger == nil {
-		return nil, gologger.ErrNilLogger
-	}
+	// Check if either the authenticator is nil
 	if authenticator == nil {
 		return nil, goginmiddlewareauth.ErrNilAuthenticator
+	}
+
+	if logger != nil {
+		logger = logger.With(slog.String("component", "gin_middleware_auth"))
 	}
 
 	return &Middleware{
@@ -35,9 +48,18 @@ func NewMiddleware(
 }
 
 // Authenticate return the middleware function that authenticates the request
-func (m *Middleware) Authenticate(
+//
+// Parameters:
+//
+//   - grpcMethod: The gRPC method to authenticate
+//   - grpcInterceptions: The gRPC interceptions map
+//
+// Returns:
+//
+//   - gin.HandlerFunc: The middleware function
+func (m Middleware) Authenticate(
 	grpcMethod string,
-	grpcInterceptions *map[string]gojwtinterception.Interception,
+	grpcInterceptions map[string]*gojwttoken.Token,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Check if the gRPC interceptions is nil
@@ -50,15 +72,21 @@ func (m *Middleware) Authenticate(
 		requestURI := ctx.Request.RequestURI
 
 		// Get the gRPC method interception
-		interception, ok := (*grpcInterceptions)[grpcMethod]
+		interception, ok := grpcInterceptions[grpcMethod]
 		if !ok {
-			m.logger.MissingGRPCMethod(requestURI)
+			if m.logger != nil {
+				m.logger.Warn(
+					"missing grpc method",
+					slog.String("method", grpcMethod),
+					slog.String("request_uri", requestURI),
+				)
+			}
 			goginresponse.SendInternalServerError(ctx)
 			return
 		}
 
 		// Check if there is None interception
-		if interception == gojwtinterception.None {
+		if interception == nil {
 			ctx.Next()
 			return
 		}
@@ -66,7 +94,7 @@ func (m *Middleware) Authenticate(
 		// Check if the interception authentication function is already set
 		fn, ok := m.authenticateFns[grpcMethod]
 		if !ok {
-			fn = m.authenticator.Authenticate(interception)
+			fn = m.authenticator.Authenticate(*interception)
 			m.authenticateFns[grpcMethod] = fn
 		}
 		fn(ctx)

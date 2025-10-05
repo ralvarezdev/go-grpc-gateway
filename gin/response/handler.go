@@ -2,6 +2,8 @@ package response
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	goflagsmode "github.com/ralvarezdev/go-flags/mode"
 	gongin "github.com/ralvarezdev/go-gin"
@@ -9,7 +11,6 @@ import (
 	gongintypes "github.com/ralvarezdev/go-gin/response"
 	gogrpcstauts "github.com/ralvarezdev/go-grpc/status"
 	"google.golang.org/grpc/codes"
-	"net/http"
 )
 
 type (
@@ -20,6 +21,15 @@ type (
 )
 
 // NewDefaultHandler creates a new default request handler
+//
+// Parameters:
+//
+//   - mode: The mode flag to determine if debug mode is enabled
+//
+// Returns:
+//
+//   - *DefaultHandler: The default handler
+//   - error: An error if the mode flag is nil
 func NewDefaultHandler(mode *goflagsmode.Flag) (*DefaultHandler, error) {
 	// Check if the flag mode is nil
 	if mode == nil {
@@ -29,19 +39,30 @@ func NewDefaultHandler(mode *goflagsmode.Flag) (*DefaultHandler, error) {
 }
 
 // HandleSuccess handles the success response
-func (d *DefaultHandler) HandleSuccess(
+//
+// Parameters:
+//
+//   - ctx: The gin context
+//   - response: The success response
+func (d DefaultHandler) HandleSuccess(
 	ctx *gin.Context,
 	response *goginresponse.Response,
 ) {
-	if response != nil && response.Code != nil {
-		ctx.JSON(*response.Code, response.Data)
+	if response != nil && response.Code() != nil {
+		ctx.JSON(*response.Code(), response.Data())
 	} else {
 		goginresponse.SendInternalServerError(ctx)
 	}
 }
 
 // HandleErrorProne handles the response that may contain an error
-func (d *DefaultHandler) HandleErrorProne(
+//
+// Parameters:
+//
+//   - ctx: The gin context
+//   - successResponse: The success response
+//   - errorResponse: The error response
+func (d DefaultHandler) HandleErrorProne(
 	ctx *gin.Context,
 	successResponse *goginresponse.Response,
 	errorResponse *goginresponse.Response,
@@ -57,7 +78,12 @@ func (d *DefaultHandler) HandleErrorProne(
 }
 
 // HandleError handles the error response
-func (d *DefaultHandler) HandleError(
+//
+// Parameters:
+//
+//   - ctx: The gin context
+//   - response: The error response
+func (d DefaultHandler) HandleError(
 	ctx *gin.Context,
 	response *goginresponse.Response,
 ) {
@@ -65,14 +91,14 @@ func (d *DefaultHandler) HandleError(
 	if response == nil {
 		goginresponse.SendInternalServerError(ctx)
 		return
-	} else if response.Code != nil {
-		ctx.JSON(*response.Code, response.Data)
+	} else if response.Code() != nil {
+		ctx.JSON(*response.Code(), response.Data())
 		ctx.Abort()
 		return
 	}
 
 	// Get the error from the response data
-	err, ok := response.Data.(error)
+	err, ok := response.Data().(error)
 	if !ok {
 		goginresponse.SendInternalServerError(ctx)
 		return

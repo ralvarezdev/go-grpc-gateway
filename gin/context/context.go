@@ -3,6 +3,7 @@ package context
 import (
 	"context"
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	gojwt "github.com/ralvarezdev/go-jwt"
 	gojwtginctx "github.com/ralvarezdev/go-jwt/gin/context"
@@ -11,9 +12,18 @@ import (
 )
 
 // GetOutgoingCtx returns a context with the raw token
+//
+// Parameters:
+//
+//   - ctx: the gin context
+//
+// Returns:
+//
+//   - context.Context: the gRPC context with the token in the metadata
+//   - error: an error if any occurred during the process
 func GetOutgoingCtx(ctx *gin.Context) (context.Context, error) {
 	// Get the raw token from the context
-	token, err := gojwtginctx.GetCtxRawToken(ctx)
+	token, err := gojwtginctx.GetCtxToken(ctx)
 	if err != nil {
 		// Check if the token is missing
 		if errors.Is(err, gojwt.ErrMissingTokenInContext) {

@@ -3,12 +3,28 @@ package context
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"io"
+
+	"github.com/gin-gonic/gin"
 )
 
 // PrepareCtx prepares the context for the gRPC request
-func PrepareCtx(ctx *gin.Context, request interface{}, outgoingCtx func(*gin.Context) (context.Context, error)) (
+//
+// Parameters:
+//
+//   - ctx: the gin context
+//   - request: the request object to bind the JSON body to
+//   - outgoingCtx: a function that takes the gin context and returns a context.Context and an error
+//
+// Returns:
+//
+//   - grpcCtx: the prepared gRPC context
+//   - err: an error if any occurred during the process
+func PrepareCtx(
+	ctx *gin.Context,
+	request interface{},
+	outgoingCtx func(*gin.Context) (context.Context, error),
+) (
 	grpcCtx context.Context,
 	err error,
 ) {
